@@ -109,17 +109,18 @@ class UdacityClient {
         }
         task.resume()
     }
-    
-    class func getStudentLocation(completion: @escaping ([StudentInformation]?, Error?) -> Void){
-        RequestHelpers.taskForGETRequest(url: Endpoints.studentLocation.url, apiType: "Parse", responseType: StudentLocation.self) { (data, error) in
-            if let data = data{
-                completion(data.results,nil)
-            }else{
-                completion([],error)
+    class func getStudentLocation(completion: @escaping ([StudentInformation]?, Error?) -> Void) {
+            RequestHelpers.taskForGETRequest(url: Endpoints.studentLocation.url, apiType: "Parse", responseType: StudentLocation.self) { (data, error) in
+                if let data = data {
+                    StudentsData.shared.students = data.results
+                    completion(data.results, nil)
+                } else {
+                    StudentsData.shared.students = []
+                    completion([], error)
+                }
             }
         }
-    }
-    
+
     // MARK: Add a Location
     
     class func addStudentLocation(information: StudentInformation, completion: @escaping (Bool, Error?) -> Void) {
@@ -127,6 +128,7 @@ class UdacityClient {
         print(body)
         RequestHelpers.taskForPOSTRequest(url: Endpoints.addLocation.url, apiType: "Parse", responseType: PostLocationResponse.self, body: body, httpMethod: "POST") { (response, error) in
             if let response = response, response.createdAt != nil {
+                StudentsData.shared.students.append(information)
                 Auth.objectId = response.objectId ?? ""
                 completion(true, nil)
             }
