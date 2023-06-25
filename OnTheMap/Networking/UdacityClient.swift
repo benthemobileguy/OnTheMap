@@ -131,8 +131,10 @@ class UdacityClient {
                 StudentsData.shared.students.append(information)
                 Auth.objectId = response.objectId ?? ""
                 completion(true, nil)
+            } else {
+                let errorMessage = error?.localizedDescription ?? "Failed to add location"
+                completion(false, NSError(domain: "com.yourapp.error", code: 0, userInfo: [NSLocalizedDescriptionKey: errorMessage]))
             }
-            completion(false, error)
         }
     }
     
